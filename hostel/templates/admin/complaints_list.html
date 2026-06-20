@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Complaints - NEXSTEP{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-sm-8">
+        <h2 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Complaint Register</h2>
+        <p class="text-muted mb-0">Track, prioritize, and resolve complaints submitted by hostel students.</p>
+    </div>
+    <div class="col-sm-4 text-sm-end mt-3 mt-sm-0">
+        <!-- Quick Filters -->
+        <div class="btn-group shadow-sm" role="group" aria-label="Complaint Filters">
+            <a href="{% url 'admin_complaints' %}" class="btn btn-{% if not current_filter %}primary{% else %}light{% endif %} btn-sm">All</a>
+            <a href="{% url 'admin_complaints' %}?status=Pending" class="btn btn-{% if current_filter == 'Pending' %}primary{% else %}light{% endif %} btn-sm">Pending</a>
+            <a href="{% url 'admin_complaints' %}?status=In Progress" class="btn btn-{% if current_filter == 'In Progress' %}primary{% else %}light{% endif %} btn-sm">In Progress</a>
+            <a href="{% url 'admin_complaints' %}?status=Resolved" class="btn btn-{% if current_filter == 'Resolved' %}primary{% else %}light{% endif %} btn-sm">Resolved</a>
+        </div>
+    </div>
+</div>
+
+<div class="card-custom">
+    <div class="table-responsive">
+        <table class="table table-custom mb-0">
+            <thead>
+                <tr>
+                    <th>Student Details</th>
+                    <th>Subject</th>
+                    <th>Description</th>
+                    <th>Date Submitted</th>
+                    <th>Current Status</th>
+                    <th class="text-end">Update Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for complaint in complaints %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold text-dark">{{ complaint.student.full_name }}</div>
+                        <div class="small text-muted">Room {{ complaint.student.room.room_number|default:"-" }}</div>
+                    </td>
+                    <td class="fw-semibold">{{ complaint.subject }}</td>
+                    <td>
+                        <p class="mb-0 text-muted small" style="max-width: 320px; white-space: normal; word-break: break-all;">
+                            {{ complaint.description }}
+                        </p>
+                    </td>
+                    <td class="small text-muted">{{ complaint.created_at|date:"M d, Y, h:i A" }}</td>
+                    <td>
+                        <span class="badge-custom {% if complaint.status == 'Pending' %}badge-pending{% elif complaint.status == 'In Progress' %}badge-progress{% else %}badge-resolved{% endif %}">
+                            {{ complaint.status }}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <form method="post" action="{% url 'update_complaint_status' complaint.pk %}" class="d-inline-flex align-items-center">
+                            {% csrf_token %}
+                            <select name="status" class="form-select form-select-sm rounded-8" onchange="this.form.submit()" style="min-width: 130px;">
+                                <option value="Pending" {% if complaint.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="In Progress" {% if complaint.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                <option value="Resolved" {% if complaint.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                            </select>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="fas fa-clipboard-check fs-1 d-block mb-3 text-light"></i>
+                        No complaints found in this category.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Rooms - NEXSTEP{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-sm-8">
+        <h2 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Rooms Directory</h2>
+        <p class="text-muted mb-0">Track room capacity, real-time occupancy counts, and availability status.</p>
+    </div>
+    <div class="col-sm-4 text-sm-end mt-3 mt-sm-0">
+        <a href="{% url 'assign_room' %}" class="btn btn-outline-primary shadow-sm me-2"><i class="fas fa-check-double me-2"></i>Assign Room</a>
+        <a href="{% url 'room_add' %}" class="btn btn-primary shadow-sm"><i class="fas fa-plus me-2"></i>Add Room</a>
+    </div>
+</div>
+
+<div class="card-custom">
+    <div class="table-responsive">
+        <table class="table table-custom mb-0">
+            <thead>
+                <tr>
+                    <th>Room Number</th>
+                    <th>Capacity</th>
+                    <th>Occupied Spots</th>
+                    <th>Occupancy Rate</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in rooms %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-door-closed text-primary fs-5"></i>
+                            </div>
+                            <span class="fw-bold text-dark fs-6">Room {{ room.room_number }}</span>
+                        </div>
+                    </td>
+                    <td class="fw-medium">{{ room.capacity }} beds</td>
+                    <td>
+                        <span class="fw-semibold">{{ room.occupied_count }} assigned</span>
+                    </td>
+                    <td style="width: 250px;">
+                        <div class="d-flex align-items-center">
+                            {% widthratio room.occupied_count room.capacity 100 as pct %}
+                            <div class="progress w-70 me-2" style="height: 6px; border-radius: 10px;">
+                                <div class="progress-bar {% if room.status == 'Full' %}bg-danger{% else %}bg-primary{% endif %}" role="progressbar" style="width: {{ pct }}%;" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="small text-muted fw-semibold">{{ pct }}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-custom {% if room.status == 'Available' %}badge-available{% else %}badge-full{% endif %}">{{ room.status }}</span>
+                    </td>
+                    <td class="text-end">
+                        <div class="d-inline-flex">
+                            <a href="{% url 'room_edit' room.pk %}" class="btn btn-light btn-sm text-primary me-2" title="Edit details">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'room_delete' room.pk %}" class="btn btn-light btn-sm text-danger" title="Delete Room">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="fas fa-door-open fs-1 d-block mb-3 text-light"></i>
+                        No rooms registered yet. Click "Add Room" to create one.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

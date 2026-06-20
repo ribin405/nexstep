@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Room - NEXSTEP{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="mb-4">
+            <a href="{% url 'room_list' %}" class="btn btn-link p-0 text-decoration-none text-muted small"><i class="fas fa-arrow-left me-1"></i>Back to Rooms</a>
+            <h2 class="fw-bold mt-2 mb-1" style="font-family: 'Outfit', sans-serif;">Assign Room</h2>
+            <p class="text-muted mb-0">Select a student and allocate them to an available room in the hostel.</p>
+        </div>
+
+        <div class="card-custom">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger border-0 mb-3 text-dark">
+                        <i class="fas fa-times-circle text-danger me-2"></i>{{ form.non_field_errors|first }}
+                    </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="id_student" class="form-label fw-semibold small text-muted">Select Student</label>
+                    {{ form.student }}
+                    {% if form.student.errors %}
+                        <div class="text-danger small mt-1">{{ form.student.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_room" class="form-label fw-semibold small text-muted">Select Available Room</label>
+                    {{ form.room }}
+                    <span class="text-muted small d-block mt-1">Only rooms that have not reached full capacity are listed here.</span>
+                    {% if form.room.errors %}
+                        <div class="text-danger small mt-1">{{ form.room.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="border-top pt-4 mt-4 d-flex justify-content-end">
+                    <a href="{% url 'room_list' %}" class="btn btn-light me-2 rounded-10 px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary rounded-10 px-4 shadow-sm">
+                        <i class="fas fa-check-double me-2"></i>Assign Room
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

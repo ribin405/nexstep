@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Notice Board - NEXSTEP{% endblock %}
+
+{% block content %}
+<h2 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Official Notice Board</h2>
+<p class="text-muted mb-4">View official announcements, event news, and alerts from the hostel warden.</p>
+
+<div class="row">
+    {% for notice in notices %}
+    <div class="col-md-6 mb-4">
+        <div class="card-custom h-100 d-flex flex-column">
+            <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                        <i class="fas fa-bullhorn small"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0 text-dark" style="font-family: 'Outfit', sans-serif;">{{ notice.title }}</h5>
+                </div>
+                <span class="small text-muted fw-medium"><i class="far fa-calendar-alt me-1 text-primary"></i> {{ notice.created_at|date:"M d, Y" }}</span>
+            </div>
+            
+            <p class="text-muted flex-grow-1 mb-0" style="white-space: pre-line; font-size: 0.95rem; line-height: 1.6;">
+                {{ notice.message }}
+            </p>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card-custom text-center p-5">
+            <i class="fas fa-bullhorn fs-1 d-block mb-3 text-light"></i>
+            <h4 class="fw-bold" style="font-family: 'Outfit', sans-serif;">Notice Board is Empty</h4>
+            <p class="text-muted mb-0">There are no announcements currently published on the notice board. Check back later!</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

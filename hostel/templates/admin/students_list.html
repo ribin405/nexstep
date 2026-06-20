@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Students - NEXSTEP{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-sm-8">
+        <h2 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Student Directory</h2>
+        <p class="text-muted mb-0">List of all students currently registered in the hostel system.</p>
+    </div>
+    <div class="col-sm-4 text-sm-end mt-3 mt-sm-0">
+        <a href="{% url 'student_add' %}" class="btn btn-primary shadow-sm"><i class="fas fa-plus me-2"></i>Add Student</a>
+    </div>
+</div>
+
+<div class="card-custom">
+    <div class="table-responsive">
+        <table class="table table-custom mb-0">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Course & Year</th>
+                    <th>Assigned Room</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-user-graduate text-primary fs-6"></i>
+                            </div>
+                            <div>
+                                <span class="fw-semibold d-block text-dark">{{ student.full_name }}</span>
+                                <span class="small text-muted">{{ student.gender }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><code class="text-secondary fw-semibold">{{ student.username }}</code></td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.phone|default:"-" }}</td>
+                    <td>
+                        {% if student.course %}
+                            <span class="fw-medium text-dark">{{ student.course }}</span>
+                            <span class="small text-muted d-block">Year {{ student.year }}</span>
+                        {% else %}
+                            <span class="text-muted small">Not Specified</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if student.room %}
+                            <span class="badge-custom badge-available">Room {{ student.room.room_number }}</span>
+                        {% else %}
+                            <span class="badge-custom badge-rejected">Unassigned</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <div class="d-inline-flex">
+                            <a href="{% url 'student_edit' student.pk %}" class="btn btn-light btn-sm text-primary me-2" title="Edit details">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'student_delete' student.pk %}" class="btn btn-light btn-sm text-danger" title="Delete Student">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <i class="fas fa-user-friends fs-1 d-block mb-3 text-light"></i>
+                        No students registered yet. Click "Add Student" to create a profile.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

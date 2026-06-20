@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Notices - NEXSTEP{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-sm-8">
+        <h2 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Notice Board Registry</h2>
+        <p class="text-muted mb-0">Publish official announcements and updates visible instantly on all student dashboards.</p>
+    </div>
+    <div class="col-sm-4 text-sm-end mt-3 mt-sm-0">
+        <a href="{% url 'notice_add' %}" class="btn btn-primary shadow-sm"><i class="fas fa-plus me-2"></i>Add Notice</a>
+    </div>
+</div>
+
+<div class="card-custom">
+    <div class="table-responsive">
+        <table class="table table-custom mb-0">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Announcement Message</th>
+                    <th>Date Published</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notice in notices %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-bullhorn text-primary fs-6"></i>
+                            </div>
+                            <span class="fw-bold text-dark">{{ notice.title }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <p class="mb-0 text-muted small" style="max-width: 400px; white-space: normal; word-break: break-all;">
+                            {{ notice.message }}
+                        </p>
+                    </td>
+                    <td class="small text-muted">{{ notice.created_at|date:"M d, Y, h:i A" }}</td>
+                    <td class="text-end">
+                        <div class="d-inline-flex">
+                            <a href="{% url 'notice_edit' notice.pk %}" class="btn btn-light btn-sm text-primary me-2" title="Edit details">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'notice_delete' notice.pk %}" class="btn btn-light btn-sm text-danger" title="Delete Notice">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-5 text-muted">
+                        <i class="fas fa-bullhorn fs-1 d-block mb-3 text-light"></i>
+                        No notices registered yet. Click "Add Notice" to post one.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Notice - NEXSTEP{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="mb-4">
+            <a href="{% url 'admin_notices' %}" class="btn btn-link p-0 text-decoration-none text-muted small"><i class="fas fa-arrow-left me-1"></i>Back to Notice Board</a>
+            <h2 class="fw-bold mt-2 mb-1" style="font-family: 'Outfit', sans-serif;">{{ action }} Notice</h2>
+            <p class="text-muted mb-0">Publish or update an announcement visible to all registered students.</p>
+        </div>
+
+        <div class="card-custom">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_title" class="form-label fw-semibold small text-muted">Notice Title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger small mt-1">{{ form.title.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_message" class="form-label fw-semibold small text-muted">Announcement Content</label>
+                    {{ form.message }}
+                    {% if form.message.errors %}
+                        <div class="text-danger small mt-1">{{ form.message.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="border-top pt-4 mt-4 d-flex justify-content-end">
+                    <a href="{% url 'admin_notices' %}" class="btn btn-light me-2 rounded-10 px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary rounded-10 px-4 shadow-sm">
+                        <i class="fas fa-save me-2"></i>{% if action == 'Add New' %}Publish Notice{% else %}Save Changes{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

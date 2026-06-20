@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Leave Requests - NEXSTEP{% endblock %}
+
+{% block content %}
+<h2 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Leave Requests Board</h2>
+<p class="text-muted mb-4">Apply for hostel leaves (vacation, weekend visits, emergencies) and trace their status in real-time.</p>
+
+<div class="row">
+    <!-- List of Out-of-Hostel Leave Requests -->
+    <div class="col-lg-8 mb-4">
+        <div class="card-custom h-100">
+            <h5 class="fw-bold mb-3" style="font-family: 'Outfit', sans-serif;"><i class="fas fa-history me-2 text-primary"></i>My Leave History</h5>
+            <div class="table-responsive">
+                <table class="table table-custom mb-0 small">
+                    <thead>
+                        <tr>
+                            <th>From Date</th>
+                            <th>To Date</th>
+                            <th>Reason for Leave</th>
+                            <th>Date Applied</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave in leaves %}
+                        <tr>
+                            <td class="fw-bold text-dark">{{ leave.from_date|date:"M d, Y" }}</td>
+                            <td class="fw-bold text-dark">{{ leave.to_date|date:"M d, Y" }}</td>
+                            <td>
+                                <p class="mb-0 text-muted" style="max-width: 250px; white-space: normal; word-break: break-all;">
+                                    {{ leave.reason }}
+                                </p>
+                            </td>
+                            <td class="text-muted">{{ leave.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="badge-custom {% if leave.status == 'Pending' %}badge-pending{% elif leave.status == 'Approved' %}badge-approved{% else %}badge-rejected{% endif %}">
+                                    {{ leave.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-plane-slash fs-2 d-block mb-2 text-light"></i>
+                                You have not submitted any leave applications yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apply for Leave Form -->
+    <div class="col-lg-4 mb-4">
+        <div class="card-custom">
+            <h5 class="fw-bold mb-3 border-bottom pb-2" style="font-family: 'Outfit', sans-serif;"><i class="fas fa-edit me-2 text-primary"></i>Apply for Leave</h5>
+            
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_from_date" class="form-label fw-semibold small text-muted">Start Date (From)</label>
+                    {{ form.from_date }}
+                    {% if form.from_date.errors %}
+                        <div class="text-danger small mt-1">{{ form.from_date.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_to_date" class="form-label fw-semibold small text-muted">End Date (To)</label>
+                    {{ form.to_date }}
+                    {% if form.to_date.errors %}
+                        <div class="text-danger small mt-1">{{ form.to_date.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_reason" class="form-label fw-semibold small text-muted">Reason for Out-of-Hostel</label>
+                    {{ form.reason }}
+                    {% if form.reason.errors %}
+                        <div class="text-danger small mt-1">{{ form.reason.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 rounded-10 py-2 fw-semibold shadow-sm">
+                    <i class="fas fa-plane-departure me-2"></i>Apply Now
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

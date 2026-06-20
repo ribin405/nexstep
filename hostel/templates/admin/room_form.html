@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Room - NEXSTEP{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="mb-4">
+            <a href="{% url 'room_list' %}" class="btn btn-link p-0 text-decoration-none text-muted small"><i class="fas fa-arrow-left me-1"></i>Back to Rooms</a>
+            <h2 class="fw-bold mt-2 mb-1" style="font-family: 'Outfit', sans-serif;">{{ action }} Room</h2>
+            <p class="text-muted mb-0">Fill in the following details to register or update a hostel room.</p>
+        </div>
+
+        <div class="card-custom">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_room_number" class="form-label fw-semibold small text-muted">Room Number/Name</label>
+                    {{ form.room_number }}
+                    {% if form.room_number.errors %}
+                        <div class="text-danger small mt-1">{{ form.room_number.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_capacity" class="form-label fw-semibold small text-muted">Maximum Capacity (Beds)</label>
+                    {{ form.capacity }}
+                    {% if form.capacity.errors %}
+                        <div class="text-danger small mt-1">{{ form.capacity.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="border-top pt-4 mt-4 d-flex justify-content-end">
+                    <a href="{% url 'room_list' %}" class="btn btn-light me-2 rounded-10 px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary rounded-10 px-4 shadow-sm">
+                        <i class="fas fa-save me-2"></i>{% if action == 'Add New' %}Create Room{% else %}Save Changes{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

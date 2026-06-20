@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - NEXSTEP{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">System Overview</h2>
+        <p class="text-muted mb-0">Track and manage room occupancies, student details, complaints, and leave requests.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'student_add' %}" class="btn btn-primary btn-custom shadow-sm me-2"><i class="fas fa-plus me-2"></i>Add Student</a>
+        <a href="{% url 'assign_room' %}" class="btn btn-outline-primary shadow-sm"><i class="fas fa-check-double me-2"></i>Assign Room</a>
+    </div>
+</div>
+
+<!-- STATS CARDS -->
+<div class="row mb-4 g-3">
+    <!-- Total Students -->
+    <div class="col-6 col-lg-3">
+        <div class="stat-card p-3 d-flex align-items-center h-100">
+            <div class="stat-icon primary me-3">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div>
+                <span class="text-muted small d-block text-uppercase fw-semibold">Students</span>
+                <span class="fs-3 fw-bold">{{ total_students }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Rooms -->
+    <div class="col-6 col-lg-3">
+        <div class="stat-card p-3 d-flex align-items-center h-100">
+            <div class="stat-icon info me-3">
+                <i class="fas fa-door-open"></i>
+            </div>
+            <div>
+                <span class="text-muted small d-block text-uppercase fw-semibold">Total Rooms</span>
+                <span class="fs-3 fw-bold">{{ total_rooms }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Rooms -->
+    <div class="col-6 col-lg-3">
+        <div class="stat-card p-3 d-flex align-items-center h-100">
+            <div class="stat-icon success me-3">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+                <span class="text-muted small d-block text-uppercase fw-semibold">Available Rooms</span>
+                <span class="fs-3 fw-bold">{{ available_rooms }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Complaints -->
+    <div class="col-6 col-lg-3">
+        <div class="stat-card p-3 d-flex align-items-center h-100">
+            <div class="stat-icon danger me-3">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>
+                <span class="text-muted small d-block text-uppercase fw-semibold">Pending Complaints</span>
+                <span class="fs-3 fw-bold text-danger">{{ pending_complaints }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CHARTS AND QUICK VISUALIZATIONS -->
+<div class="row mb-4">
+    <div class="col-md-6 col-lg-7">
+        <div class="card-custom h-100">
+            <h5 class="fw-bold mb-3" style="font-family: 'Outfit', sans-serif;">Hostel Analytics</h5>
+            <div style="position: relative; height:240px;">
+                <canvas id="hostelBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-5">
+        <div class="card-custom h-100">
+            <h5 class="fw-bold mb-3" style="font-family: 'Outfit', sans-serif;">Room Status</h5>
+            <div style="position: relative; height:240px;" class="d-flex align-items-center justify-content-center">
+                <canvas id="roomPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DATA QUICK VIEWS -->
+<div class="row">
+    <!-- Unresolved Complaints -->
+    <div class="col-lg-6 mb-4">
+        <div class="card-custom h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0" style="font-family: 'Outfit', sans-serif;">Pending Complaints</h5>
+                <a href="{% url 'admin_complaints' %}?status=Pending" class="btn btn-link btn-sm text-decoration-none">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-custom mb-0">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for complaint in recent_complaints %}
+                            {% if complaint.status == 'Pending' or complaint.status == 'In Progress' %}
+                            <tr>
+                                <td class="fw-medium">{{ complaint.student.full_name }}</td>
+                                <td>{{ complaint.subject|truncatechars:20 }}</td>
+                                <td class="small text-muted">{{ complaint.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge-custom {% if complaint.status == 'Pending' %}badge-pending{% else %}badge-progress{% endif %}">{{ complaint.status }}</span>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted small">No pending complaints at this time.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Notices -->
+    <div class="col-lg-6 mb-4">
+        <div class="card-custom h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0" style="font-family: 'Outfit', sans-serif;">Notice Board</h5>
+                <a href="{% url 'admin_notices' %}" class="btn btn-link btn-sm text-decoration-none">Manage Board</a>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for notice in recent_notices %}
+                <div class="list-group-item px-0 py-3 border-0 {% if not forloop.last %}border-bottom{% endif %}">
+                    <div class="d-flex justify-content-between mb-1">
+                        <h6 class="fw-semibold mb-0">{{ notice.title }}</h6>
+                        <span class="small text-muted">{{ notice.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <p class="text-muted small mb-0 text-truncate">{{ notice.message }}</p>
+                </div>
+                {% empty %}
+                <div class="text-center py-4 text-muted small">No notices posted.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // --- BAR CHART: COMPLAINT STATUSES ---
+        const barCtx = document.getElementById('hostelBarChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Pending', 'In Progress', 'Resolved', 'Leave Applications'],
+                datasets: [{
+                    label: 'Counts',
+                    data: [{{ pending_complaints }}, {{ in_progress_complaints }}, {{ resolved_complaints }}, {{ total_leaves }}],
+                    backgroundColor: [
+                        'rgba(217, 119, 6, 0.75)',  // Pending - Amber
+                        'rgba(37, 99, 235, 0.75)',   // Progress - Blue
+                        'rgba(5, 150, 105, 0.75)',   // Resolved - Emerald
+                        'rgba(79, 70, 229, 0.75)'    // Leaves - Indigo
+                    ],
+                    borderColor: [
+                        '#d97706',
+                        '#2563eb',
+                        '#059669',
+                        '#4f46e5'
+                    ],
+                    borderWidth: 1.5,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
+            }
+        });
+
+        // --- PIE CHART: ROOM STATUSES ---
+        const pieCtx = document.getElementById('roomPieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Full', 'Partially Occupied', 'Vacant'],
+                datasets: [{
+                    data: [{{ full_rooms }}, {{ partially_occupied }}, {{ vacant_rooms }}],
+                    backgroundColor: [
+                        '#ef4444', // Full
+                        '#4f46e5', // Partially Occupied
+                        '#10b981'  // Vacant
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15,
+                            font: { size: 11 }
+                        }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    });
+</script>
+{% endblock %}

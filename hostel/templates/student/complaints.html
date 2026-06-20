@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}My Complaints - NEXSTEP{% endblock %}
+
+{% block content %}
+<h2 class="fw-bold mb-1" style="font-family: 'Outfit', sans-serif;">Complaint Portal</h2>
+<p class="text-muted mb-4">Submit complaints about hostel facilities, maintenance, or other issues and track their statuses.</p>
+
+<div class="row">
+    <!-- List of Filed Complaints -->
+    <div class="col-lg-8 mb-4">
+        <div class="card-custom h-100">
+            <h5 class="fw-bold mb-3" style="font-family: 'Outfit', sans-serif;"><i class="fas fa-clipboard-list me-2 text-primary"></i>My Registered Complaints</h5>
+            <div class="table-responsive">
+                <table class="table table-custom mb-0 small">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Description</th>
+                            <th>Date Lodged</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for complaint in complaints %}
+                        <tr>
+                            <td class="fw-bold text-dark">{{ complaint.subject }}</td>
+                            <td>
+                                <p class="mb-0 text-muted" style="max-width: 280px; white-space: normal; word-break: break-all;">
+                                    {{ complaint.description }}
+                                </p>
+                            </td>
+                            <td class="text-muted">{{ complaint.created_at|date:"M d, Y, h:i A" }}</td>
+                            <td>
+                                <span class="badge-custom {% if complaint.status == 'Pending' %}badge-pending{% elif complaint.status == 'In Progress' %}badge-progress{% else %}badge-resolved{% endif %}">
+                                    {{ complaint.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="fas fa-clipboard-check fs-2 d-block mb-2 text-light"></i>
+                                You have not submitted any complaints yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Complaint Form -->
+    <div class="col-lg-4 mb-4">
+        <div class="card-custom">
+            <h5 class="fw-bold mb-3 border-bottom pb-2" style="font-family: 'Outfit', sans-serif;"><i class="fas fa-edit me-2 text-primary"></i>Submit Complaint</h5>
+            
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_subject" class="form-label fw-semibold small text-muted">Subject</label>
+                    {{ form.subject }}
+                    {% if form.subject.errors %}
+                        <div class="text-danger small mt-1">{{ form.subject.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_description" class="form-label fw-semibold small text-muted">Detailed Description</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors|first }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 rounded-10 py-2 fw-semibold shadow-sm">
+                    <i class="fas fa-paper-plane me-2"></i>Submit Ticket
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
