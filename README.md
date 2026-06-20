@@ -115,3 +115,7 @@ To Run
 python manage.py runserver
 
 to add in github
+
+git add .
+git commit -m "____"
+git push
